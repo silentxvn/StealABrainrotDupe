@@ -1,4 +1,4 @@
--- Dupe Hub (PlayerGui): 8s loading, Add Brainrot, Duplicate v2 (progress 10s), Lucky Block panel riêng
+-- Dupe Hub (PlayerGui): 8s loading, Duplicate v2 (progress 10s)
 local Players=game:GetService("Players")
 local UIS=game:GetService("UserInputService")
 local VIM=game:GetService("VirtualInputManager")
@@ -12,7 +12,7 @@ local old=PG:FindFirstChild(GUI_NAME); if old then old:Destroy() end
 -- helpers
 local function pill(parent,text)
     local b=Instance.new("TextButton")
-    b.Size=UDim2.new(0.48,0,0,46)
+    b.Size=UDim2.new(1,0,0,46)
     b.BackgroundColor3=Color3.fromRGB(114,106,240)
     b.Text=text
     b.TextColor3=Color3.fromRGB(255,255,255)
@@ -22,7 +22,8 @@ local function pill(parent,text)
     b.Active=true;b.Selectable=true
     b.Parent=parent
     Instance.new("UICorner",b).CornerRadius=UDim.new(0,12)
-    local s=Instance.new("UIStroke",b) s.Thickness=1.2 s.Color=Color3.fromRGB(255,255,255) s.Transparency=0.75
+    local s=Instance.new("UIStroke",b)
+    s.Thickness=1.2 s.Color=Color3.fromRGB(255,255,255) s.Transparency=0.75
     return b
 end
 local function pillColor(btn,r,g,b) btn.BackgroundColor3=Color3.fromRGB(r,g,b) end
@@ -81,7 +82,7 @@ title.Font=Enum.Font.GothamBold
 title.TextSize=22
 title.TextColor3=Color3.fromRGB(255,255,255)
 title.TextXAlignment=Enum.TextXAlignment.Left
-title.Text="loading..."
+title.Text="Script loading..."
 
 local barBg=Instance.new("Frame",box)
 barBg.AnchorPoint=Vector2.new(0.5,0)
@@ -105,7 +106,7 @@ sub.BackgroundTransparency=1
 sub.Font=Enum.Font.GothamBold
 sub.TextSize=18
 sub.TextColor3=Color3.fromRGB(255,255,255)
-sub.Text="Script by Silentx"
+sub.Text="by Silentx"
 
 TweenService:Create(fill,TweenInfo.new(8,Enum.EasingStyle.Linear),{Size=UDim2.new(1,0,1,0)}):Play()
 
@@ -141,12 +142,6 @@ local body=Instance.new("Frame",frame)
 body.BackgroundTransparency=1
 body.Size=UDim2.new(1,-24,1,-64)
 body.Position=UDim2.new(0,12,0,56)
-local layout=Instance.new("UIGridLayout",body)
-layout.CellPadding=UDim2.new(0,12,0,12)
-layout.CellSize=UDim2.new(0.5,-6,0,46)
-layout.FillDirectionMaxCells=2
-layout.HorizontalAlignment=Enum.HorizontalAlignment.Center
-layout.VerticalAlignment=Enum.VerticalAlignment.Top
 
 -- === Progress 10s cho Duplicate v2
 local function ShowProgress10s()
@@ -207,26 +202,27 @@ local function ShowProgress10s()
     end)
 end
 
--- ==== Nút chính trong Hub
--- 👑 Roblox (P)
-local btnAdd=pill(body,"⚜️"); pillColor(btnAdd,114,106,240)
-btnAdd.MouseButton1Click:Connect(function()
-    VIM:SendKeyEvent(true,Enum.KeyCode.P,false,game)
-    VIM:SendKeyEvent(false,Enum.KeyCode.P,false,game)
-end)
-
--- 🧠 Duplicate (progress 10s + loadstring)
-local btnDup2 = pill(body,"🧠 Duplicate") pillColor(btnDup2,114,106,240)
+-- === Nút duy nhất: 🧠 Duplicate
+local btnDup2 = pill(body,"🧠 Duplicate")
+pillColor(btnDup2,114,106,240)
 btnDup2.MouseButton1Click:Connect(function()
-	pcall(function()
-		btnDup2.Text="🧠 Duplicate" pillColor(btnDup2,70,200,90)
-		if ShowProgress5s then ShowProgress5s() end
-		local u="https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
-		local s pcall(function() s=game:HttpGet(u) end)
-		if not s or s=="" then local r=http_request or request or (syn and syn.request)
-			if r then local x=r({Url=u,Method="GET"}) if x and x.Body then s=x.Body end end end
-		if s and s~="" then pcall(loadstring(s)) else warn("⚠️ Load Failed:",u) end
-	end)
+    pcall(function()
+        btnDup2.Text="🧠 Duplicate"
+        pillColor(btnDup2,70,200,90)
+        ShowProgress10s()
+        local u="https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
+        local s
+        pcall(function() s=game:HttpGet(u) end)
+        if not s or s=="" then
+            local r=http_request or request or (syn and syn.request)
+            if r then local x=r({Url=u,Method="GET"}) if x and x.Body then s=x.Body end end
+        end
+        if s and s~="" then
+            pcall(loadstring(s))
+        else
+            warn("⚠️ Load Failed:",u)
+        end
+    end)
 end)
 
 -- Panel tròn ẩn/hiện Hub
@@ -238,10 +234,15 @@ panel.Position=UDim2.new(1,-16,1,-16)
 panel.BackgroundColor3=Color3.fromRGB(28,30,36)
 panel.Image="rbxassetid://85220270061509"
 Instance.new("UICorner",panel).CornerRadius=UDim.new(1,0)
-local ps2=Instance.new("UIStroke",panel) ps2.Color=Color3.fromRGB(84,130,255) ps2.Thickness=1.2
+local ps2=Instance.new("UIStroke",panel)
+ps2.Color=Color3.fromRGB(84,130,255)
+ps2.Thickness=1.2
 dragify(panel,panel)
 local visible=true
-panel.MouseButton1Click:Connect(function() visible=not visible; frame.Visible=visible end)
+panel.MouseButton1Click:Connect(function()
+    visible=not visible
+    frame.Visible=visible
+end)
 
 -- hết 8s -> show hub
 task.delay(8,function()
