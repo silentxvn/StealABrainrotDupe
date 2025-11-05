@@ -6,7 +6,7 @@ local TweenService=game:GetService("TweenService")
 local LP=Players.LocalPlayer
 local PG=LP:WaitForChild("PlayerGui")
 
-local GUI_NAME="NoobRoblox_TongHop_PG"
+local GUI_NAME="Dupe_Hub_Roblox"
 local old=PG:FindFirstChild(GUI_NAME); if old then old:Destroy() end
 
 -- helpers
