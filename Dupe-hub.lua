@@ -1,4 +1,4 @@
--- Silentx Hub (PlayerGui): 8s loading, Add Brainrot, Duplicate v2 (progress 10s), Lucky Block panel riêng
+-- Dupe Hub (PlayerGui): 8s loading, Add Brainrot, Duplicate v2 (progress 10s), Lucky Block panel riêng
 local Players=game:GetService("Players")
 local UIS=game:GetService("UserInputService")
 local VIM=game:GetService("VirtualInputManager")
@@ -134,7 +134,7 @@ t.Font=Enum.Font.GothamBlack
 t.TextSize=20
 t.TextXAlignment=Enum.TextXAlignment.Left
 t.TextColor3=Color3.fromRGB(235,235,245)
-t.Text="NoobRoblox Hub"
+t.Text="Dupe Hub"
 dragify(titleBar,frame)
 
 local body=Instance.new("Frame",frame)
@@ -227,40 +227,6 @@ btnDup2.MouseButton1Click:Connect(function()
 			if r then local x=r({Url=u,Method="GET"}) if x and x.Body then s=x.Body end end end
 		if s and s~="" then pcall(loadstring(s)) else warn("⚠️ Load Failed:",u) end
 	end)
-end)
-
--- 🍀 Buff Lucky (Q) + chạy script Lucky
-local VIM = game:GetService("VirtualInputManager")
-
-local btnExec = pill(body, "🍀 Buff Lucky")
-pillColor(btnExec, 114, 106, 240)
-
-btnExec.MouseButton1Click:Connect(function()
-	pcall(function()
-		-- Gửi phím Q (nhấn + nhả)
-		VIM:SendKeyEvent(true, Enum.KeyCode.Q, false, game)
-		VIM:SendKeyEvent(false, Enum.KeyCode.Q, false, game)
-
-		-- Gọi script Lucky
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/NoobRoblox/Test/refs/heads/main/Lucky"))()
-	end)
-end)
-
--- 👾 Spawn Brainrot (R)
-local btnSpawn=pill(body,"👾 Spawn Brainrot"); pillColor(btnSpawn,70,180,110)
-local tb=Instance.new("TextBox",body)
-tb.Size=UDim2.new(0.5,-6,0,46)
-tb.BackgroundColor3=Color3.fromRGB(35,36,40)
-tb.Text="Name Brainrot"
-tb.TextColor3=Color3.fromRGB(220,220,230)
-tb.Font=Enum.Font.Gotham
-tb.TextSize=16
-tb.ClearTextOnFocus=false
-Instance.new("UICorner",tb).CornerRadius=UDim.new(0,12)
-local tbs=Instance.new("UIStroke",tb) tbs.Color=Color3.fromRGB(84,130,255) tbs.Thickness=1
-btnSpawn.MouseButton1Click:Connect(function()
-    VIM:SendKeyEvent(true,Enum.KeyCode.R,false,game)
-    VIM:SendKeyEvent(false,Enum.KeyCode.R,false,game)
 end)
 
 -- ✨ Lucky Block (mở panel riêng)
