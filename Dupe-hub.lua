@@ -1,7 +1,6 @@
--- Dupe Hub v2 (PlayerGui): 8s loading, Duplicate v2 (progress 10s, draggable)
+-- Dupe Hub v2.1 (PlayerGui): giao diện chỉnh chiều cao và nút lệch trái
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
-local VIM = game:GetService("VirtualInputManager")
 local TweenService = game:GetService("TweenService")
 local LP = Players.LocalPlayer
 local PG = LP:WaitForChild("PlayerGui")
@@ -10,10 +9,9 @@ local GUI_NAME = "Dupe_Hub_Roblox"
 local old = PG:FindFirstChild(GUI_NAME)
 if old then old:Destroy() end
 
--- helper: drag & button
 local function pill(parent, text)
 	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(1, 0, 0, 46)
+	b.Size = UDim2.new(0.66, 0, 0, 46) -- chỉ chiếm 2/3 chiều ngang
 	b.BackgroundColor3 = Color3.fromRGB(114, 106, 240)
 	b.Text = text
 	b.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -36,24 +34,19 @@ local function pillColor(btn, r, g, b)
 end
 
 local function dragify(handle, target)
-	local dragging = false
-	local dragInput, startPos, startInputPos
+	local dragging, dragInput, startPos, startInputPos
 	handle.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			dragging = true
 			startPos = target.Position
 			startInputPos = input.Position
 			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-				end
+				if input.UserInputState == Enum.UserInputState.End then dragging = false end
 			end)
 		end
 	end)
 	handle.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-			dragInput = input
-		end
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end
 	end)
 	UIS.InputChanged:Connect(function(input)
 		if dragging and input == dragInput then
@@ -121,8 +114,8 @@ TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDi
 -- Main Hub
 local frame = Instance.new("Frame", gui)
 frame.Visible = false
-frame.Size = UDim2.new(0, 400, 0, 220)
-frame.Position = UDim2.new(0.5, -200, 0.5, -110)
+frame.Size = UDim2.new(0, 400, 0, 150) -- thấp hơn, khít hơn
+frame.Position = UDim2.new(0.5, -200, 0.5, -75)
 frame.BackgroundColor3 = Color3.fromRGB(20, 22, 26)
 frame.BorderSizePixel = 0
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
@@ -151,7 +144,7 @@ body.BackgroundTransparency = 1
 body.Size = UDim2.new(1, -24, 1, -64)
 body.Position = UDim2.new(0, 12, 0, 56)
 
--- Progress 10s cho Duplicate
+-- Progress 10s
 local function ShowProgress10s()
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
@@ -200,19 +193,19 @@ local function ShowProgress10s()
 
 	task.spawn(function()
 		for i = 1, 100 do
-			percent.Text = tostring(i) .. "%"
+			percent.Text = i .. "%"
 			pf.Size = UDim2.new(i / 100, 0, 1, 0)
 			task.wait(0.1)
 		end
 		mt.Text = "Success"
-		percent.Text = "100%"
 		task.wait(0.8)
 		modal:Destroy()
 	end)
 end
 
--- Nút duy nhất 🧠 Duplicate
+-- Nút 🧠 Duplicate lệch trái, vừa khung
 local btnDup2 = pill(body, "🧠 Duplicate")
+btnDup2.Position = UDim2.new(0, 0, 0, 0)
 pillColor(btnDup2, 114, 106, 240)
 btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
@@ -222,19 +215,11 @@ btnDup2.MouseButton1Click:Connect(function()
 		local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
 		local s
 		pcall(function() s = game:HttpGet(u) end)
-		if not s or s == "" then
-			local r = http_request or request or (syn and syn.request)
-			if r then local x = r({Url = u, Method = "GET"}) if x and x.Body then s = x.Body end end
-		end
-		if s and s ~= "" then
-			pcall(loadstring(s))
-		else
-			warn("⚠️ Load Failed:", u)
-		end
+		if s and s ~= "" then pcall(loadstring(s)) else warn("⚠️ Load Failed:", u) end
 	end)
 end)
 
--- Panel ẩn/hiện Hub
+-- Panel toggle
 local panel = Instance.new("ImageButton", gui)
 panel.Visible = false
 panel.Size = UDim2.new(0, 64, 0, 64)
@@ -254,10 +239,10 @@ panel.MouseButton1Click:Connect(function()
 	frame.Visible = visible
 end)
 
--- Hiện Hub sau 8s
+-- Delay hiển thị
 task.delay(8, function()
-	if bg then bg:Destroy() end
-	if box then box:Destroy() end
+	bg:Destroy()
+	box:Destroy()
 	frame.Visible = true
 	panel.Visible = true
 end)
