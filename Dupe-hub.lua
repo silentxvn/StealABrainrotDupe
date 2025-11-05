@@ -1,4 +1,4 @@
--- Dupe Hub v2.1 (PlayerGui): giao diện chỉnh chiều cao và nút lệch trái
+-- Dupe Hub v2.2 (Màu nền cũ)
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -11,15 +11,13 @@ if old then old:Destroy() end
 
 local function pill(parent, text)
 	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(0.66, 0, 0, 46) -- chỉ chiếm 2/3 chiều ngang
+	b.Size = UDim2.new(0.66, 0, 0, 46)
 	b.BackgroundColor3 = Color3.fromRGB(114, 106, 240)
 	b.Text = text
 	b.TextColor3 = Color3.fromRGB(255, 255, 255)
 	b.Font = Enum.Font.GothamSemibold
 	b.TextSize = 18
 	b.AutoButtonColor = true
-	b.Active = true
-	b.Selectable = true
 	b.Parent = parent
 	Instance.new("UICorner", b).CornerRadius = UDim.new(0, 12)
 	local s = Instance.new("UIStroke", b)
@@ -56,65 +54,15 @@ local function dragify(handle, target)
 	end)
 end
 
--- GUI root
 local gui = Instance.new("ScreenGui")
 gui.Name = GUI_NAME
 gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 gui.Parent = PG
 
--- Loading box (8s)
-local bg = Instance.new("Frame", gui)
-bg.Size = UDim2.new(1, 0, 1, 0)
-bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-bg.BackgroundTransparency = 0.35
-
-local box = Instance.new("Frame", gui)
-box.AnchorPoint = Vector2.new(0.5, 0.5)
-box.Position = UDim2.new(0.5, 0, 0.5, 0)
-box.Size = UDim2.new(0, 380, 0, 130)
-box.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-box.BorderSizePixel = 0
-Instance.new("UICorner", box).CornerRadius = UDim.new(0, 16)
-dragify(box, box)
-
-local avatar = Instance.new("ImageLabel", box)
-avatar.Size = UDim2.new(0, 56, 0, 56)
-avatar.Position = UDim2.new(0, 16, 0, 12)
-avatar.BackgroundTransparency = 1
-avatar.Image = "rbxassetid://85220270061509"
-Instance.new("UICorner", avatar).CornerRadius = UDim.new(1, 0)
-
-local title = Instance.new("TextLabel", box)
-title.BackgroundTransparency = 1
-title.Position = UDim2.new(0, 84, 0, 16)
-title.Size = UDim2.new(1, -90, 0, 28)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 22
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextXAlignment = Enum.TextXAlignment.Left
-title.Text = "Script loading..."
-
-local barBg = Instance.new("Frame", box)
-barBg.AnchorPoint = Vector2.new(0.5, 0)
-barBg.Position = UDim2.new(0.5, 0, 0, 78)
-barBg.Size = UDim2.new(0.9, 0, 0, 22)
-barBg.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-barBg.BorderSizePixel = 0
-Instance.new("UICorner", barBg).CornerRadius = UDim.new(0, 12)
-
-local fill = Instance.new("Frame", barBg)
-fill.Size = UDim2.new(0, 0, 1, 0)
-fill.BackgroundColor3 = Color3.fromRGB(160, 90, 255)
-fill.BorderSizePixel = 0
-Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
-
-TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
-
--- Main Hub
 local frame = Instance.new("Frame", gui)
 frame.Visible = false
-frame.Size = UDim2.new(0, 400, 0, 150) -- thấp hơn, khít hơn
+frame.Size = UDim2.new(0, 400, 0, 150)
 frame.Position = UDim2.new(0.5, -200, 0.5, -75)
 frame.BackgroundColor3 = Color3.fromRGB(20, 22, 26)
 frame.BorderSizePixel = 0
@@ -144,82 +92,45 @@ body.BackgroundTransparency = 1
 body.Size = UDim2.new(1, -24, 1, -64)
 body.Position = UDim2.new(0, 12, 0, 56)
 
--- Progress 10s
-local function ShowProgress10s()
-	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
-	local modal = Instance.new("Frame", gui)
-	modal.Name = "KS_ProgressModal"
-	modal.Size = UDim2.new(0, 380, 0, 130)
-	modal.AnchorPoint = Vector2.new(0.5, 0.5)
-	modal.Position = UDim2.new(0.5, 0, 0.5, 0)
-	modal.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-	modal.BorderSizePixel = 0
-	Instance.new("UICorner", modal).CornerRadius = UDim.new(0, 16)
-	dragify(modal, modal)
+local progress = Instance.new("Frame", frame)
+progress.Visible = false
+progress.Size = UDim2.new(1, 0, 0, 60)
+progress.Position = UDim2.new(0, 0, 1, 0)
+progress.BackgroundColor3 = Color3.fromRGB(28, 30, 36)
+Instance.new("UICorner", progress).CornerRadius = UDim.new(0, 12)
 
-	local mt = Instance.new("TextLabel", modal)
-	mt.BackgroundTransparency = 1
-	mt.Position = UDim2.new(0, 16, 0, 12)
-	mt.Size = UDim2.new(1, -32, 0, 26)
-	mt.Font = Enum.Font.GothamBold
-	mt.TextSize = 20
-	mt.TextColor3 = Color3.fromRGB(255, 255, 255)
-	mt.TextXAlignment = Enum.TextXAlignment.Left
-	mt.Text = "Duplicate"
+local percent = Instance.new("TextLabel", progress)
+percent.BackgroundTransparency = 1
+percent.Size = UDim2.new(1, -32, 0, 30)
+percent.Position = UDim2.new(0, 16, 0, 15)
+percent.Font = Enum.Font.GothamSemibold
+percent.TextSize = 18
+percent.TextColor3 = Color3.fromRGB(255, 255, 255)
+percent.TextXAlignment = Enum.TextXAlignment.Left
+percent.Text = "0%"
 
-	local percent = Instance.new("TextLabel", modal)
-	percent.BackgroundTransparency = 1
-	percent.Position = UDim2.new(0, 16, 0, 44)
-	percent.Size = UDim2.new(1, -32, 0, 22)
-	percent.Font = Enum.Font.Gotham
-	percent.TextSize = 18
-	percent.TextColor3 = Color3.fromRGB(210, 210, 215)
-	percent.TextXAlignment = Enum.TextXAlignment.Left
-	percent.Text = "1%"
+local pf = Instance.new("Frame", progress)
+pf.Size = UDim2.new(0, 0, 0, 6)
+pf.Position = UDim2.new(0, 16, 1, -14)
+pf.BackgroundColor3 = Color3.fromRGB(70, 200, 90)
+pf.BorderSizePixel = 0
+Instance.new("UICorner", pf).CornerRadius = UDim.new(0, 6)
 
-	local pbg = Instance.new("Frame", modal)
-	pbg.AnchorPoint = Vector2.new(0.5, 0)
-	pbg.Position = UDim2.new(0.5, 0, 0, 76)
-	pbg.Size = UDim2.new(0.9, 0, 0, 22)
-	pbg.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-	pbg.BorderSizePixel = 0
-	Instance.new("UICorner", pbg).CornerRadius = UDim.new(0, 12)
-
-	local pf = Instance.new("Frame", pbg)
-	pf.Size = UDim2.new(0, 0, 1, 0)
-	pf.BackgroundColor3 = Color3.fromRGB(70, 200, 90)
-	pf.BorderSizePixel = 0
-	Instance.new("UICorner", pf).CornerRadius = UDim.new(0, 12)
-
-	task.spawn(function()
-		for i = 1, 100 do
-			percent.Text = i .. "%"
-			pf.Size = UDim2.new(i / 100, 0, 1, 0)
-			task.wait(0.1)
-		end
-		mt.Text = "Success"
-		task.wait(0.8)
-		modal:Destroy()
-	end)
-end
-
--- Nút 🧠 Duplicate lệch trái, vừa khung
 local btnDup2 = pill(body, "🧠 Duplicate")
 btnDup2.Position = UDim2.new(0, 0, 0, 0)
 pillColor(btnDup2, 114, 106, 240)
 btnDup2.MouseButton1Click:Connect(function()
-	pcall(function()
-		btnDup2.Text = "🧠 Duplicate"
-		pillColor(btnDup2, 70, 200, 90)
-		ShowProgress10s()
-		local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
-		local s
-		pcall(function() s = game:HttpGet(u) end)
-		if s and s ~= "" then pcall(loadstring(s)) else warn("⚠️ Load Failed:", u) end
-	end)
+	progress.Visible = true
+	for i = 1, 100 do
+		percent.Text = i .. "%"
+		pf.Size = UDim2.new(i / 100, -32, 0, 6)
+		task.wait(0.1)
+	end
+	percent.Text = "Completed!"
+	task.wait(0.8)
+	progress.Visible = false
 end)
 
--- Panel toggle
 local panel = Instance.new("ImageButton", gui)
 panel.Visible = false
 panel.Size = UDim2.new(0, 64, 0, 64)
@@ -237,12 +148,10 @@ local visible = true
 panel.MouseButton1Click:Connect(function()
 	visible = not visible
 	frame.Visible = visible
+	progress.Visible = visible and progress.Visible
 end)
 
--- Delay hiển thị
 task.delay(8, function()
-	bg:Destroy()
-	box:Destroy()
 	frame.Visible = true
 	panel.Visible = true
 end)
