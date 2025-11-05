@@ -11,7 +11,7 @@ if old then old:Destroy() end
 
 local function pill(parent, text)
 	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(1, 0, 0, 46) -- chiếm hết chiều ngang
+	b.Size = UDim2.new(1, 0, 0, 46)
 	b.BackgroundColor3 = Color3.fromRGB(114, 106, 240)
 	b.Text = text
 	b.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -114,7 +114,7 @@ TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDi
 -- Main Hub
 local frame = Instance.new("Frame", gui)
 frame.Visible = false
-frame.Size = UDim2.new(0, 280, 0, 150) -- thu hẹp chiều ngang
+frame.Size = UDim2.new(0, 280, 0, 150)
 frame.Position = UDim2.new(0.5, -140, 0.5, -75)
 frame.BackgroundColor3 = Color3.fromRGB(20, 22, 26)
 frame.BorderSizePixel = 0
@@ -144,8 +144,13 @@ body.BackgroundTransparency = 1
 body.Size = UDim2.new(1, -36, 1, -64)
 body.Position = UDim2.new(0, 18, 0, 56)
 
--- Progress 10s
-local function ShowProgress10s()
+-- Nút 🧠 Duplicate chiếm toàn khung
+local btnDup2 = pill(body, "🧠 Duplicate")
+btnDup2.Position = UDim2.new(0, 0, 0, 0)
+pillColor(btnDup2, 114, 106, 240)
+
+-- Tiến trình 10s + đổi màu sau khi xong
+local function ShowProgress10sSync(callback)
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
 	modal.Name = "KS_ProgressModal"
@@ -200,22 +205,22 @@ local function ShowProgress10s()
 		mt.Text = "Success"
 		task.wait(0.8)
 		modal:Destroy()
+		if callback then callback() end
 	end)
 end
 
--- Nút 🧠 Duplicate chiếm toàn khung
-local btnDup2 = pill(body, "🧠 Duplicate")
-btnDup2.Position = UDim2.new(0, 0, 0, 0)
-pillColor(btnDup2, 114, 106, 240)
+-- Khi bấm nút
 btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
 		btnDup2.Text = "🧠 Duplicate"
-		pillColor(btnDup2, 70, 200, 90)
-		ShowProgress10s()
-		local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
-		local s
-		pcall(function() s = game:HttpGet(u) end)
-		if s and s ~= "" then pcall(loadstring(s)) else warn("⚠️ Load Failed:", u) end
+		pillColor(btnDup2, 114, 106, 240) -- Giữ màu tím
+		ShowProgress10sSync(function()
+			pillColor(btnDup2, 70, 200, 90) -- Đổi xanh khi xong
+			local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
+			local s
+			pcall(function() s = game:HttpGet(u) end)
+			if s and s ~= "" then pcall(loadstring(s)) else warn("⚠️ Load Failed:", u) end
+		end)
 	end)
 end)
 
