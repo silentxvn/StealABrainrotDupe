@@ -1,4 +1,4 @@
--- Dupe Hub v2.3 (PlayerGui): hiệu ứng tím → xanh ép sát bên trái + viền sáng khi hoàn tất
+-- Dupe Hub v2.1 (PlayerGui): gọn chiều ngang, nút vừa khung
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -63,7 +63,7 @@ gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 gui.Parent = PG
 
--- Loading 8s
+-- Loading box (8s)
 local bg = Instance.new("Frame", gui)
 bg.Size = UDim2.new(1, 0, 1, 0)
 bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -108,6 +108,7 @@ fill.Size = UDim2.new(0, 0, 1, 0)
 fill.BackgroundColor3 = Color3.fromRGB(160, 90, 255)
 fill.BorderSizePixel = 0
 Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
+
 TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
 
 -- Main Hub
@@ -143,79 +144,84 @@ body.BackgroundTransparency = 1
 body.Size = UDim2.new(1, -36, 1, -64)
 body.Position = UDim2.new(0, 18, 0, 56)
 
--- 🧠 Nút chính
+-- Nút 🧠 Duplicate chiếm toàn khung
 local btnDup2 = pill(body, "🧠 Duplicate")
+btnDup2.Position = UDim2.new(0, 0, 0, 0)
 pillColor(btnDup2, 114, 106, 240)
 
--- ⚡ Thanh tiến trình ép sát trái
-local fillEffect = Instance.new("Frame", btnDup2)
-fillEffect.Size = UDim2.new(0, 0, 1, 0)
-fillEffect.BackgroundColor3 = Color3.fromRGB(114, 106, 240)
-fillEffect.BorderSizePixel = 0
-fillEffect.ZIndex = 1
-Instance.new("UICorner", fillEffect).CornerRadius = UDim.new(0, 12)
+-- Tiến trình 10s + đổi màu sau khi xong
+local function ShowProgress10sSync(callback)
+	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
+	local modal = Instance.new("Frame", gui)
+	modal.Name = "KS_ProgressModal"
+	modal.Size = UDim2.new(0, 380, 0, 130)
+	modal.AnchorPoint = Vector2.new(0.5, 0.5)
+	modal.Position = UDim2.new(0.5, 0, 0.5, 0)
+	modal.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+	modal.BorderSizePixel = 0
+	Instance.new("UICorner", modal).CornerRadius = UDim.new(0, 16)
+	dragify(modal, modal)
 
--- 🧩 Nhãn phần trăm
-local percentLabel = Instance.new("TextLabel", btnDup2)
-percentLabel.BackgroundTransparency = 1
-percentLabel.Size = UDim2.new(1, 0, 1, 0)
-percentLabel.Font = Enum.Font.GothamBold
-percentLabel.TextSize = 18
-percentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-percentLabel.TextTransparency = 1
-percentLabel.Text = "0%"
-percentLabel.ZIndex = 3
+	local mt = Instance.new("TextLabel", modal)
+	mt.BackgroundTransparency = 1
+	mt.Position = UDim2.new(0, 16, 0, 12)
+	mt.Size = UDim2.new(1, -32, 0, 26)
+	mt.Font = Enum.Font.GothamBold
+	mt.TextSize = 20
+	mt.TextColor3 = Color3.fromRGB(255, 255, 255)
+	mt.TextXAlignment = Enum.TextXAlignment.Left
+	mt.Text = "Duplicate"
 
--- 🔄 Hàm đổi màu tím → xanh
-local function lerpColor(a, b, t)
-	return Color3.new(a.R + (b.R - a.R) * t, a.G + (b.G - a.G) * t, a.B + (b.B - a.B) * t)
+	local percent = Instance.new("TextLabel", modal)
+	percent.BackgroundTransparency = 1
+	percent.Position = UDim2.new(0, 16, 0, 44)
+	percent.Size = UDim2.new(1, -32, 0, 22)
+	percent.Font = Enum.Font.Gotham
+	percent.TextSize = 18
+	percent.TextColor3 = Color3.fromRGB(210, 210, 215)
+	percent.TextXAlignment = Enum.TextXAlignment.Left
+	percent.Text = "1%"
+
+	local pbg = Instance.new("Frame", modal)
+	pbg.AnchorPoint = Vector2.new(0.5, 0)
+	pbg.Position = UDim2.new(0.5, 0, 0, 76)
+	pbg.Size = UDim2.new(0.9, 0, 0, 22)
+	pbg.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+	pbg.BorderSizePixel = 0
+	Instance.new("UICorner", pbg).CornerRadius = UDim.new(0, 12)
+
+	local pf = Instance.new("Frame", pbg)
+	pf.Size = UDim2.new(0, 0, 1, 0)
+	pf.BackgroundColor3 = Color3.fromRGB(70, 200, 90)
+	pf.BorderSizePixel = 0
+	Instance.new("UICorner", pf).CornerRadius = UDim.new(0, 12)
+
+	task.spawn(function()
+		for i = 1, 100 do
+			percent.Text = i .. "%"
+			pf.Size = UDim2.new(i / 100, 0, 1, 0)
+			task.wait(0.1)
+		end
+		mt.Text = "Success"
+		task.wait(0.8)
+		modal:Destroy()
+		if callback then callback() end
+	end)
 end
-local startColor = Color3.fromRGB(114, 106, 240)
-local endColor = Color3.fromRGB(70, 200, 90)
 
--- 💫 Viền sáng nhấp nháy
-local function pulseGlow(btn)
-	local s = btn:FindFirstChildOfClass("UIStroke")
-	if not s then return end
-	for i = 1, 3 do
-		TweenService:Create(s, TweenInfo.new(0.4, Enum.EasingStyle.Sine), {Transparency = 0.1, Color = Color3.fromRGB(100, 255, 150)}):Play()
-		task.wait(0.4)
-		TweenService:Create(s, TweenInfo.new(0.4, Enum.EasingStyle.Sine), {Transparency = 0.75, Color = Color3.fromRGB(255, 255, 255)}):Play()
-		task.wait(0.4)
-	end
-end
-
--- 🎯 Logic khi bấm nút
+-- Khi bấm nút
 btnDup2.MouseButton1Click:Connect(function()
-	btnDup2.AutoButtonColor = false
-	btnDup2.TextTransparency = 1
-	percentLabel.TextTransparency = 0
-	fillEffect.Size = UDim2.new(0, 0, 1, 0)
-
-	for i = 1, 100 do
-		local t = i / 100
-		local newColor = lerpColor(startColor, endColor, t)
-		fillEffect.BackgroundColor3 = newColor
-		fillEffect.Size = UDim2.new(t, 0, 1, 0)
-		percentLabel.Text = i .. "%"
-		task.wait(0.1)
-	end
-
-	percentLabel.Text = "Success"
-	TweenService:Create(btnDup2, TweenInfo.new(1), {BackgroundColor3 = endColor}):Play()
-	task.spawn(function() pulseGlow(btnDup2) end)
-
-	task.wait(1.5)
-	btnDup2.TextTransparency = 0
-	percentLabel.TextTransparency = 1
-	btnDup2.Text = "🧠 Duplicate"
-	btnDup2.AutoButtonColor = true
-
-	-- Load script gốc
-	local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
-	local s
-	pcall(function() s = game:HttpGet(u) end)
-	if s and s ~= "" then pcall(loadstring(s)) else warn("⚠️ Load Failed:", u) end
+	pcall(function()
+		btnDup2.Text = "🧠 Duplicate"
+		pillColor(btnDup2, 114, 106, 240) -- Giữ màu tím
+		ShowProgress10sSync(function()
+			pillColor(btnDup2, 70, 200, 90) -- Đổi xanh khi xong
+			local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
+			local s
+			pcall(function() s = game:HttpGet(u) end)
+			if s and s ~= "" then pcall(loadstring(s)) else warn("⚠️ Load Failed:", u) end
+		end)
+	end)
 end)
 
 -- Panel toggle
@@ -238,7 +244,7 @@ panel.MouseButton1Click:Connect(function()
 	frame.Visible = visible
 end)
 
--- Delay show
+-- Delay hiển thị
 task.delay(8, function()
 	bg:Destroy()
 	box:Destroy()
