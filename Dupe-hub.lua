@@ -109,7 +109,7 @@ fill.BackgroundColor3 = Color3.fromRGB(160, 90, 255)
 fill.BorderSizePixel = 0
 Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
 
-TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+TweenService:Create(fill, TweenInfo.new(20, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
 
 -- Main Hub
 local frame = Instance.new("Frame", gui)
@@ -150,7 +150,7 @@ btnDup2.Position = UDim2.new(0, 0, 0, 0)
 pillColor(btnDup2, 114, 106, 240)
 
 -- Tiến trình 10s + đổi màu sau khi xong
-local function ShowProgress10sSync(callback)
+local function ShowProgress20sSync(callback)
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
 	modal.Name = "KS_ProgressModal"
@@ -214,7 +214,7 @@ btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
 		btnDup2.Text = "🧠 Duplicate"
 		pillColor(btnDup2, 114, 106, 240) -- Giữ màu tím
-		ShowProgress10sSync(function()
+		ShowProgress20sSync(function()
 			pillColor(btnDup2, 70, 200, 90) -- Đổi xanh khi xong
 			local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
 			local s
