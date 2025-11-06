@@ -113,7 +113,7 @@ fill.BackgroundColor3 = Color3.fromRGB(160, 90, 255)
 fill.BorderSizePixel = 0
 Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
 
--- Sử dụng LOADING_TIME ở đây
+-- Sử dụng LOADING_TIME ở đây cho tween
 TweenService:Create(fill, TweenInfo.new(LOADING_TIME, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
 
 -- Main Hub
@@ -229,10 +229,8 @@ btnDup2.MouseButton1Click:Connect(function()
 			pillColor(btnDup2, 70, 200, 90) -- Đổi xanh khi xong
 
 			-- An toàn: không thực hiện game:HttpGet/loadstring.
-			-- Nếu bạn cần chạy hành vi an toàn tại đây, thay bằng hàm nội bộ rõ ràng.
-			warn("External script execution is blocked for safety. No HttpGet/loadstring was performed.")
+			warn("External script execution is blocked for safety. No remote code was executed.")
 			
-			-- Tuỳ chọn: hiển thị modal thông báo thay vì load string
 			local notice = Instance.new("Frame", gui)
 			notice.AnchorPoint = Vector2.new(0.5, 0.5)
 			notice.Position = UDim2.new(0.5, 0.5, 0, 0)
