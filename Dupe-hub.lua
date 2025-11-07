@@ -1,4 +1,4 @@
--- Dupe Hub v2.3 (PlayerGui) - Light effects + loading 8s replaced (avatar + gradient)
+-- Dupe Hub v2.3 (PlayerGui): giữ icon Roblox + xoá vùng mờ ngoài loading
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -24,10 +24,10 @@ local function pill(parent, text)
 	b.Parent = parent
 	Instance.new("UICorner", b).CornerRadius = UDim.new(0, 12)
 	local s = Instance.new("UIStroke", b)
-	s.Thickness = 1.6
+	s.Thickness = 1.2
 	s.Color = Color3.fromRGB(255, 255, 255)
-	s.Transparency = 0.3
-	return b, s
+	s.Transparency = 0.75
+	return b
 end
 
 local function pillColor(btn, r, g, b)
@@ -64,7 +64,7 @@ gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 gui.Parent = PG
 
--- ===== Loading box (8s) replacement: avatar + gradient, no full-screen dim =====
+-- Loading box (8s) - giữ icon + xoá overlay
 local box = Instance.new("Frame", gui)
 box.AnchorPoint = Vector2.new(0.5, 0.5)
 box.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -72,24 +72,14 @@ box.Size = UDim2.new(0, 380, 0, 130)
 box.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 box.BorderSizePixel = 0
 Instance.new("UICorner", box).CornerRadius = UDim.new(0, 16)
-pcall(function() dragify(box, box) end)
+dragify(box, box)
 
 local avatar = Instance.new("ImageLabel", box)
 avatar.Size = UDim2.new(0, 56, 0, 56)
 avatar.Position = UDim2.new(0, 16, 0, 12)
 avatar.BackgroundTransparency = 1
+avatar.Image = "rbxassetid://85220270061509" -- icon Roblox của bạn
 Instance.new("UICorner", avatar).CornerRadius = UDim.new(1, 0)
-
-pcall(function()
-	local thumbType = Enum.ThumbnailType.HeadShot
-	local thumbSize = Enum.ThumbnailSize.Size100x100
-	local content = Players:GetUserThumbnailAsync(LP.UserId, thumbType, thumbSize)
-	if content and content ~= "" then
-		avatar.Image = content
-	else
-		avatar.Image = "rbxassetid://85220270061509"
-	end
-end)
 
 local title = Instance.new("TextLabel", box)
 title.BackgroundTransparency = 1
@@ -115,44 +105,10 @@ fill.BackgroundColor3 = Color3.fromRGB(160, 90, 255)
 fill.BorderSizePixel = 0
 Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
 
--- gradient đổi màu tím -> xanh -> hồng
-local grad = Instance.new("UIGradient", fill)
-grad.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(170, 100, 255)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(90, 200, 255)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 120, 200))
-}
-grad.Rotation = 0
+-- Hiệu ứng fill mượt hơn
+TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 1, 0)}):Play()
 
--- animate gradient rotation for dynamic effect
-local running = true
-task.spawn(function()
-	while running and grad and grad.Parent do
-		for i = 0, 360, 6 do
-			grad.Rotation = i
-			task.wait(0.03)
-		end
-	end
-end)
-
-TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
-TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {BackgroundColor3 = Color3.fromRGB(160,90,255)}):Play()
-
-TweenService:GetPropertyChangedSignal(fill, "Size"):Connect(function() end) -- noop to avoid warnings in some executors
-
--- On complete: remove loading box and show main hub later
-do
-	local conn
-	conn = TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)})
-	conn:Play()
-	conn.Completed:Connect(function()
-		running = false
-		if box and box.Parent then box:Destroy() end
-		-- frame will be made visible later by the main hub code below
-	end)
-end
-
--- ===== Main Hub =====
+-- Main Hub
 local frame = Instance.new("Frame", gui)
 frame.Visible = false
 frame.Size = UDim2.new(0, 400, 0, 150)
@@ -180,12 +136,13 @@ t.TextColor3 = Color3.fromRGB(235, 235, 245)
 t.Text = "Dupe Hub"
 dragify(titleBar, frame)
 
+-- Body
 local body = Instance.new("Frame", frame)
 body.BackgroundTransparency = 1
 body.Size = UDim2.new(1, -32, 0, 60)
 body.Position = UDim2.new(0, 16, 0, 64)
 
--- Progress 10s function (kept similar to original)
+-- Hiệu ứng tiến trình 10s
 local function ShowProgress10s()
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
@@ -244,68 +201,15 @@ local function ShowProgress10s()
 	end)
 end
 
--- Nút 🧠 Duplicate cân khít + effects
-local btnDup2, stroke = pill(body, "🧠 Duplicate")
+-- Nút 🧠 Duplicate
+local btnDup2 = pill(body, "🧠 Duplicate")
 pillColor(btnDup2, 114, 106, 240)
-
--- Viền sáng đổi màu
-task.spawn(function()
-	while btnDup2 and stroke do
-		for _, c in ipairs({
-			Color3.fromRGB(70, 200, 255),
-			Color3.fromRGB(100, 255, 180),
-			Color3.fromRGB(255, 200, 90),
-			Color3.fromRGB(180, 120, 255)
-		}) do
-			if not stroke then break end
-			TweenService:Create(stroke, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Color = c}):Play()
-			task.wait(0.6)
-		end
-	end
-end)
-
--- Gradient background for the button
-local gradBtn = Instance.new("UIGradient", btnDup2)
-gradBtn.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 200, 255)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(120, 80, 255)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(90, 200, 255))
-}
-task.spawn(function()
-	while gradBtn and gradBtn.Parent do
-		for i = 0, 360, 5 do
-			gradBtn.Rotation = i
-			task.wait(0.05)
-		end
-	end
-end)
-
--- Shine effect on hover (only on this button)
-do
-	local shine = Instance.new("Frame", btnDup2)
-	shine.Name = "KS_Shine"
-	shine.Size = UDim2.new(0.15, 0, 1.8, 0)
-	shine.Position = UDim2.new(-0.2, 0, -0.4, 0)
-	shine.BackgroundTransparency = 0.85
-	shine.BackgroundColor3 = Color3.new(1,1,1)
-	Instance.new("UICorner", shine).CornerRadius = UDim.new(0, 12)
-	shine.Visible = false
-
-	btnDup2.MouseEnter:Connect(function()
-		shine.Visible = true
-		shine.BackgroundTransparency = 0.85
-		shine.Position = UDim2.new(-0.2, 0, -0.4, 0)
-		local tween = TweenService:Create(shine, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(1.2, 0, -0.4, 0), BackgroundTransparency = 0.6})
-		tween:Play()
-		tween.Completed:Connect(function() shine.Visible = false end)
-	end)
-end
-
 btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
 		btnDup2.Text = "🧠 Duplicate"
-		pillColor(btnDup2, 70, 200, 90)
 		ShowProgress10s()
+		task.wait(10)
+		pillColor(btnDup2, 70, 200, 90)
 		local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
 		local s
 		pcall(function() s = game:HttpGet(u) end)
@@ -333,10 +237,9 @@ panel.MouseButton1Click:Connect(function()
 	frame.Visible = visible
 end)
 
--- Delay hiển thị (keep 8s loading behaviour)
+-- Delay hiển thị
 task.delay(8, function()
-	-- ensure box destroyed (in case tween completed earlier)
-	if box and box.Parent then box:Destroy() end
+	box:Destroy()
 	frame.Visible = true
 	panel.Visible = true
 end)
