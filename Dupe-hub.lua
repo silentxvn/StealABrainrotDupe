@@ -110,53 +110,33 @@ fill.BackgroundColor3 = Color3.fromRGB(160, 90, 255)
 fill.BorderSizePixel = 0
 Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
 
-TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+-- Hiệu ứng Aurora Rainbow cho thanh tiến trình
+local function createRainbowEffect()
+    local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true) -- Loop liên tục
+    local colors = {
+        Color3.fromRGB(255, 0, 0), -- Red
+        Color3.fromRGB(255, 127, 0), -- Orange
+        Color3.fromRGB(255, 255, 0), -- Yellow
+        Color3.fromRGB(0, 255, 0), -- Green
+        Color3.fromRGB(0, 0, 255), -- Blue
+        Color3.fromRGB(75, 0, 130), -- Indigo
+        Color3.fromRGB(238, 130, 238) -- Violet
+    }
 
--- Thêm hiệu ứng lấp lánh vào nền menu loading
-local function createGlowEffect()
-	local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true) -- Đảo ngược liên tục
-	local tween1 = TweenService:Create(bg, tweenInfo, {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}) -- Màu sáng
-	local tween2 = TweenService:Create(bg, tweenInfo, {BackgroundColor3 = Color3.fromRGB(0, 0, 0)}) -- Màu tối
+    local function cycleColors()
+        local index = 1
+        while true do
+            TweenService:Create(fill, tweenInfo, {BackgroundColor3 = colors[index]}):Play()
+            index = (index % #colors) + 1
+            task.wait(1)
+        end
+    end
 
-	tween1:Play()
-	tween2:Play()
+    -- Chạy hiệu ứng Rainbow
+    task.spawn(cycleColors)
 end
 
-createGlowEffect()
-
--- Main Hub (Only after 8s loading)
-local frame = Instance.new("Frame", gui)
-frame.Visible = false
-frame.Size = UDim2.new(0, 400, 0, 150) -- Full size menu for after loading
-frame.Position = UDim2.new(0.5, -200, 0.5, -75)
-frame.BackgroundColor3 = Color3.fromRGB(20, 22, 26)
-frame.BorderSizePixel = 0
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
-local fs = Instance.new("UIStroke", frame)
-fs.Color = Color3.fromRGB(85, 85, 95)
-fs.Thickness = 1
-
-local titleBar = Instance.new("Frame", frame)
-titleBar.Size = UDim2.new(1, 0, 0, 48)
-titleBar.BackgroundColor3 = Color3.fromRGB(28, 30, 36)
-titleBar.BorderSizePixel = 0
-Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 16)
-local t = Instance.new("TextLabel", titleBar)
-t.BackgroundTransparency = 1
-t.Size = UDim2.new(1, -120, 1, 0)
-t.Position = UDim2.new(0, 16, 0, 0)
-t.Font = Enum.Font.GothamBlack
-t.TextSize = 20
-t.TextXAlignment = Enum.TextXAlignment.Left
-t.TextColor3 = Color3.fromRGB(235, 235, 245)
-t.Text = "Dupe Hub"
-dragify(titleBar, frame)
-
--- Body
-local body = Instance.new("Frame", frame)
-body.BackgroundTransparency = 1
-body.Size = UDim2.new(1, -32, 0, 60)
-body.Position = UDim2.new(0, 16, 0, 64)
+createRainbowEffect()
 
 -- Tiến trình 10s + callback khi hoàn tất
 local function ShowProgress10s(callback)
