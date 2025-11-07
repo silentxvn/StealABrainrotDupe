@@ -1,4 +1,4 @@
--- Dupe Hub v2.2 (PlayerGui): fix khoảng thừa phải & dưới nút Duplicate
+-- Dupe Hub v2.3 (PlayerGui): hiệu ứng viền sáng động + màu chạy trong nút Duplicate
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -9,9 +9,10 @@ local GUI_NAME = "Dupe_Hub_Roblox"
 local old = PG:FindFirstChild(GUI_NAME)
 if old then old:Destroy() end
 
+-- ================== Các hàm tiện ích ==================
 local function pill(parent, text)
 	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(1, -8, 1, -8) -- khít đều 4 phía
+	b.Size = UDim2.new(1, -8, 1, -8)
 	b.Position = UDim2.new(0, 4, 0, 4)
 	b.BackgroundColor3 = Color3.fromRGB(114, 106, 240)
 	b.Text = text
@@ -24,10 +25,10 @@ local function pill(parent, text)
 	b.Parent = parent
 	Instance.new("UICorner", b).CornerRadius = UDim.new(0, 12)
 	local s = Instance.new("UIStroke", b)
-	s.Thickness = 1.2
+	s.Thickness = 1.6
 	s.Color = Color3.fromRGB(255, 255, 255)
-	s.Transparency = 0.75
-	return b
+	s.Transparency = 0.3
+	return b, s
 end
 
 local function pillColor(btn, r, g, b)
@@ -57,14 +58,14 @@ local function dragify(handle, target)
 	end)
 end
 
--- GUI root
+-- ================== GUI chính ==================
 local gui = Instance.new("ScreenGui")
 gui.Name = GUI_NAME
 gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 gui.Parent = PG
 
--- Loading box (8s)
+-- Loading (8s)
 local bg = Instance.new("Frame", gui)
 bg.Size = UDim2.new(1, 0, 1, 0)
 bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -112,7 +113,7 @@ Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
 
 TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
 
--- Main Hub
+-- ================== Khung chính ==================
 local frame = Instance.new("Frame", gui)
 frame.Visible = false
 frame.Size = UDim2.new(0, 400, 0, 150)
@@ -140,13 +141,12 @@ t.TextColor3 = Color3.fromRGB(235, 235, 245)
 t.Text = "Dupe Hub"
 dragify(titleBar, frame)
 
--- Body khít nút
 local body = Instance.new("Frame", frame)
 body.BackgroundTransparency = 1
 body.Size = UDim2.new(1, -32, 0, 60)
 body.Position = UDim2.new(0, 16, 0, 64)
 
--- Hiệu ứng tiến trình 10s
+-- ================== Thanh tiến trình 10s ==================
 local function ShowProgress10s()
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
@@ -205,12 +205,45 @@ local function ShowProgress10s()
 	end)
 end
 
--- Nút 🧠 Duplicate cân khít
-local btnDup2 = pill(body, "🧠 Duplicate")
-pillColor(btnDup2, 114, 106, 240)
+-- ================== Nút 🧠 Duplicate ==================
+local btnDup2, stroke = pill(body, "🧠 Duplicate")
+
+-- Hiệu ứng viền sáng nhấp nháy
+task.spawn(function()
+	while btnDup2 do
+		for _, c in ipairs({
+			Color3.fromRGB(70, 200, 255),
+			Color3.fromRGB(100, 255, 180),
+			Color3.fromRGB(255, 200, 90),
+			Color3.fromRGB(180, 120, 255)
+		}) do
+			if not stroke then break end
+			TweenService:Create(stroke, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Color = c}):Play()
+			task.wait(0.6)
+		end
+	end
+end)
+
+-- Hiệu ứng màu chạy gradient trong nút
+local grad = Instance.new("UIGradient", btnDup2)
+grad.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 200, 255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(120, 80, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(90, 200, 255))
+}
+grad.Rotation = 0
+
+task.spawn(function()
+	while grad do
+		for i = 0, 360, 5 do
+			grad.Rotation = i
+			task.wait(0.05)
+		end
+	end
+end)
+
 btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
-		btnDup2.Text = "🧠 Duplicate"
 		pillColor(btnDup2, 70, 200, 90)
 		ShowProgress10s()
 		local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
@@ -220,7 +253,7 @@ btnDup2.MouseButton1Click:Connect(function()
 	end)
 end)
 
--- Panel toggle
+-- ================== Panel ẩn/hiện ==================
 local panel = Instance.new("ImageButton", gui)
 panel.Visible = false
 panel.Size = UDim2.new(0, 64, 0, 64)
@@ -240,7 +273,7 @@ panel.MouseButton1Click:Connect(function()
 	frame.Visible = visible
 end)
 
--- Delay hiển thị
+-- ================== Delay hiển thị ==================
 task.delay(8, function()
 	bg:Destroy()
 	box:Destroy()
