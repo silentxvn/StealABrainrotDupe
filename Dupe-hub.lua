@@ -1,4 +1,4 @@
--- Dupe Hub v2.1 (PlayerGui): thu gọn phần thừa bên phải & dưới nút Duplicate (chuẩn theo ảnh)
+-- Dupe Hub v2.1 (PlayerGui): thu gọn phần thừa bên phải & dưới nút Duplicate (chỉ chỉnh vị trí nút cho cân đều)
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -11,7 +11,7 @@ if old then old:Destroy() end
 
 local function pill(parent, text)
 	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(0.7, 0, 0, 46) -- ✅ tăng width nút nhẹ cho cân
+	b.Size = UDim2.new(0.66, 0, 0, 46)
 	b.BackgroundColor3 = Color3.fromRGB(114, 106, 240)
 	b.Text = text
 	b.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -114,8 +114,8 @@ TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDi
 -- Main Hub
 local frame = Instance.new("Frame", gui)
 frame.Visible = false
-frame.Size = UDim2.new(0, 300, 0, 120) -- ✅ thu gọn ngang cho khít nút
-frame.Position = UDim2.new(0.5, -150, 0.5, -60)
+frame.Size = UDim2.new(0, 340, 0, 120)
+frame.Position = UDim2.new(0.5, -170, 0.5, -60)
 frame.BackgroundColor3 = Color3.fromRGB(20, 22, 26)
 frame.BorderSizePixel = 0
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
@@ -139,15 +139,15 @@ t.TextColor3 = Color3.fromRGB(235, 235, 245)
 t.Text = "Dupe Hub"
 dragify(titleBar, frame)
 
--- ⚙️ body thu gọn đều 4 phía
+-- body: để rìa trái và phải gần nhau (giữ padding trái 12, phải 12)
 local body = Instance.new("Frame", frame)
 body.BackgroundTransparency = 1
-body.Size = UDim2.new(1, -40, 1, -72) -- ✅ giảm bớt phải, giữ đều 4 mép
+body.Size = UDim2.new(1, -24, 1, -64) -- giữ -24 để rìa phải = rìa trái (12px)
 body.Position = UDim2.new(0, 12, 0, 56)
 
--- Nút Duplicate
+-- Nút Duplicate: đặt vào giữa ngang của body dựa trên width 0.66 (0.17 là (1-0.66)/2)
 local btnDup2 = pill(body, "🧠 Duplicate")
-btnDup2.Position = UDim2.new(0, 0, 0, 0)
+btnDup2.Position = UDim2.new(0.17, 0, 0, 0) -- CHỈ DÒNG ĐÃ SỬA: căn đều 2 bên
 pillColor(btnDup2, 114, 106, 240)
 
 btnDup2.MouseButton1Click:Connect(function()
