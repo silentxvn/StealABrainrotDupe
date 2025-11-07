@@ -1,4 +1,4 @@
--- Dupe Hub v2.1 (PlayerGui): thu gọn phần thừa bên phải nút Duplicate, KHÔNG đổi gì khác
+-- Dupe Hub v2.1 (PlayerGui): thu gọn phần thừa bên phải & dưới nút Duplicate
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -11,7 +11,7 @@ if old then old:Destroy() end
 
 local function pill(parent, text)
 	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(0.66, 0, 0, 46) -- vẫn giữ nguyên
+	b.Size = UDim2.new(0.66, 0, 0, 46)
 	b.BackgroundColor3 = Color3.fromRGB(114, 106, 240)
 	b.Text = text
 	b.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -63,7 +63,7 @@ gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 gui.Parent = PG
 
--- Loading box (8s)
+-- Loading (8s)
 local bg = Instance.new("Frame", gui)
 bg.Size = UDim2.new(1, 0, 1, 0)
 bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -114,8 +114,8 @@ TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDi
 -- Main Hub
 local frame = Instance.new("Frame", gui)
 frame.Visible = false
-frame.Size = UDim2.new(0, 360, 0, 150) -- ⚙️ giảm nhẹ chiều ngang (từ 400 → 360)
-frame.Position = UDim2.new(0.5, -180, 0.5, -75) -- ⚙️ giữ giữa màn hình
+frame.Size = UDim2.new(0, 340, 0, 120) -- ⚙️ giảm ngang + cao cho khít với nút
+frame.Position = UDim2.new(0.5, -170, 0.5, -60)
 frame.BackgroundColor3 = Color3.fromRGB(20, 22, 26)
 frame.BorderSizePixel = 0
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
@@ -139,80 +139,21 @@ t.TextColor3 = Color3.fromRGB(235, 235, 245)
 t.Text = "Dupe Hub"
 dragify(titleBar, frame)
 
--- ⚙️ body thu nhỏ ngang, đẩy nút ra giữa hơn (cắt bớt bên phải)
+-- ⚙️ body thu hẹp vừa nút
 local body = Instance.new("Frame", frame)
 body.BackgroundTransparency = 1
-body.Size = UDim2.new(1, -80, 1, -64) -- ⚙️ giảm từ -24 → -80 để cắt bớt phần rìa phải
+body.Size = UDim2.new(1, -60, 1, -72) -- cắt bớt rìa phải & dưới
 body.Position = UDim2.new(0, 12, 0, 56)
 
--- Progress 10s (nguyên vẹn)
-local function ShowProgress10s()
-	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
-	local modal = Instance.new("Frame", gui)
-	modal.Name = "KS_ProgressModal"
-	modal.Size = UDim2.new(0, 380, 0, 130)
-	modal.AnchorPoint = Vector2.new(0.5, 0.5)
-	modal.Position = UDim2.new(0.5, 0, 0.5, 0)
-	modal.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-	modal.BorderSizePixel = 0
-	Instance.new("UICorner", modal).CornerRadius = UDim.new(0, 16)
-	dragify(modal, modal)
-
-	local mt = Instance.new("TextLabel", modal)
-	mt.BackgroundTransparency = 1
-	mt.Position = UDim2.new(0, 16, 0, 12)
-	mt.Size = UDim2.new(1, -32, 0, 26)
-	mt.Font = Enum.Font.GothamBold
-	mt.TextSize = 20
-	mt.TextColor3 = Color3.fromRGB(255, 255, 255)
-	mt.TextXAlignment = Enum.TextXAlignment.Left
-	mt.Text = "Duplicate"
-
-	local percent = Instance.new("TextLabel", modal)
-	percent.BackgroundTransparency = 1
-	percent.Position = UDim2.new(0, 16, 0, 44)
-	percent.Size = UDim2.new(1, -32, 0, 22)
-	percent.Font = Enum.Font.Gotham
-	percent.TextSize = 18
-	percent.TextColor3 = Color3.fromRGB(210, 210, 215)
-	percent.TextXAlignment = Enum.TextXAlignment.Left
-	percent.Text = "1%"
-
-	local pbg = Instance.new("Frame", modal)
-	pbg.AnchorPoint = Vector2.new(0.5, 0)
-	pbg.Position = UDim2.new(0.5, 0, 0, 76)
-	pbg.Size = UDim2.new(0.9, 0, 0, 22)
-	pbg.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-	pbg.BorderSizePixel = 0
-	Instance.new("UICorner", pbg).CornerRadius = UDim.new(0, 12)
-
-	local pf = Instance.new("Frame", pbg)
-	pf.Size = UDim2.new(0, 0, 1, 0)
-	pf.BackgroundColor3 = Color3.fromRGB(70, 200, 90)
-	pf.BorderSizePixel = 0
-	Instance.new("UICorner", pf).CornerRadius = UDim.new(0, 12)
-
-	task.spawn(function()
-		for i = 1, 100 do
-			percent.Text = i .. "%"
-			pf.Size = UDim2.new(i / 100, 0, 1, 0)
-			task.wait(0.1)
-		end
-		mt.Text = "Success"
-		task.wait(0.8)
-		modal:Destroy()
-	end)
-end
-
--- Nút 🧠 Duplicate (nguyên vị trí, không đổi kích thước)
+-- Nút Duplicate
 local btnDup2 = pill(body, "🧠 Duplicate")
 btnDup2.Position = UDim2.new(0, 0, 0, 0)
 pillColor(btnDup2, 114, 106, 240)
+
 btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
 		btnDup2.Text = "🧠 Duplicate"
 		pillColor(btnDup2, 70, 200, 90)
-		ShowProgress10s()
 		local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
 		local s
 		pcall(function() s = game:HttpGet(u) end)
@@ -220,7 +161,7 @@ btnDup2.MouseButton1Click:Connect(function()
 	end)
 end)
 
--- Panel toggle (nguyên vẹn)
+-- Panel toggle
 local panel = Instance.new("ImageButton", gui)
 panel.Visible = false
 panel.Size = UDim2.new(0, 64, 0, 64)
@@ -240,7 +181,7 @@ panel.MouseButton1Click:Connect(function()
 	frame.Visible = visible
 end)
 
--- Delay hiển thị (8s)
+-- Delay hiển thị
 task.delay(8, function()
 	bg:Destroy()
 	box:Destroy()
