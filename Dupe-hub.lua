@@ -1,4 +1,4 @@
--- Dupe Hub v2.3 (PlayerGui): giữ icon Roblox + xoá vùng mờ ngoài loading
+-- Dupe Hub v2.3 (PlayerGui): giữ icon Roblox + loading đều tốc độ
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -64,7 +64,7 @@ gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 gui.Parent = PG
 
--- Loading box (8s) - giữ icon + xoá overlay
+-- Loading box (8s, chạy đều)
 local box = Instance.new("Frame", gui)
 box.AnchorPoint = Vector2.new(0.5, 0.5)
 box.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -78,7 +78,7 @@ local avatar = Instance.new("ImageLabel", box)
 avatar.Size = UDim2.new(0, 56, 0, 56)
 avatar.Position = UDim2.new(0, 16, 0, 12)
 avatar.BackgroundTransparency = 1
-avatar.Image = "rbxassetid://85220270061509" -- icon Roblox của bạn
+avatar.Image = "rbxassetid://85220270061509"
 Instance.new("UICorner", avatar).CornerRadius = UDim.new(1, 0)
 
 local title = Instance.new("TextLabel", box)
@@ -105,8 +105,8 @@ fill.BackgroundColor3 = Color3.fromRGB(160, 90, 255)
 fill.BorderSizePixel = 0
 Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
 
--- Hiệu ứng fill mượt hơn
-TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+-- Chạy đều từ đầu tới cuối (Linear)
+TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 1, 0)}):Play()
 
 -- Main Hub
 local frame = Instance.new("Frame", gui)
@@ -142,7 +142,7 @@ body.BackgroundTransparency = 1
 body.Size = UDim2.new(1, -32, 0, 60)
 body.Position = UDim2.new(0, 16, 0, 64)
 
--- Hiệu ứng tiến trình 10s
+-- Hiệu ứng tiến trình đều (10s)
 local function ShowProgress10s()
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
@@ -208,7 +208,7 @@ btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
 		btnDup2.Text = "🧠 Duplicate"
 		ShowProgress10s()
-		task.wait(10)
+		task.wait(10.8) -- đợi đúng khi progress đầy 100%
 		pillColor(btnDup2, 70, 200, 90)
 		local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
 		local s
@@ -237,7 +237,7 @@ panel.MouseButton1Click:Connect(function()
 	frame.Visible = visible
 end)
 
--- Delay hiển thị
+-- Hiển thị sau khi thanh loading đầy
 task.delay(8, function()
 	box:Destroy()
 	frame.Visible = true
