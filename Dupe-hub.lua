@@ -112,6 +112,18 @@ Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
 
 TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
 
+-- Thêm hiệu ứng lấp lánh vào nền menu loading
+local function createGlowEffect()
+	local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true) -- Đảo ngược liên tục
+	local tween1 = TweenService:Create(bg, tweenInfo, {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}) -- Màu sáng
+	local tween2 = TweenService:Create(bg, tweenInfo, {BackgroundColor3 = Color3.fromRGB(0, 0, 0)}) -- Màu tối
+
+	tween1:Play()
+	tween2:Play()
+end
+
+createGlowEffect()
+
 -- Main Hub (Only after 8s loading)
 local frame = Instance.new("Frame", gui)
 frame.Visible = false
