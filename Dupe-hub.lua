@@ -73,7 +73,7 @@ bg.BackgroundTransparency = 0.35
 local box = Instance.new("Frame", gui)
 box.AnchorPoint = Vector2.new(0.5, 0.5)
 box.Position = UDim2.new(0.5, 0, 0.5, 0)
-box.Size = UDim2.new(0, 190, 0, 130) -- Thu nhỏ menu
+box.Size = UDim2.new(0, 380, 0, 130) -- Menu loading
 box.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 box.BorderSizePixel = 0
 Instance.new("UICorner", box).CornerRadius = UDim.new(0, 16)
@@ -112,11 +112,11 @@ Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
 
 TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
 
--- Main Hub
+-- Main Hub (Only after 8s loading)
 local frame = Instance.new("Frame", gui)
 frame.Visible = false
-frame.Size = UDim2.new(0, 200, 0, 150) -- Thu nhỏ menu
-frame.Position = UDim2.new(0.5, -100, 0.5, -75) -- Điều chỉnh vị trí của menu
+frame.Size = UDim2.new(0, 400, 0, 150) -- Full size menu for after loading
+frame.Position = UDim2.new(0.5, -200, 0.5, -75)
 frame.BackgroundColor3 = Color3.fromRGB(20, 22, 26)
 frame.BorderSizePixel = 0
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
@@ -151,7 +151,7 @@ local function ShowProgress10s(callback)
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
 	modal.Name = "KS_ProgressModal"
-	modal.Size = UDim2.new(0, 190, 0, 130) -- Thu nhỏ modal
+	modal.Size = UDim2.new(0, 380, 0, 130) -- Modal size remains full
 	modal.AnchorPoint = Vector2.new(0.5, 0.5)
 	modal.Position = UDim2.new(0.5, 0, 0.5, 0)
 	modal.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
@@ -202,7 +202,7 @@ local function ShowProgress10s(callback)
 		mt.Text = "Success"
 		task.wait(0.6)
 		modal:Destroy()
-		if callback then callback() end -- chỉ gọi sau khi đầy 100%
+		if callback then callback() end -- gọi sau khi đầy 100%
 	end)
 end
 
@@ -243,10 +243,14 @@ panel.MouseButton1Click:Connect(function()
 	frame.Visible = visible
 end)
 
--- Delay hiển thị
+-- Delay hiển thị và thu nhỏ menu sau khi loading
 task.delay(8, function()
 	bg:Destroy()
 	box:Destroy()
 	frame.Visible = true
 	panel.Visible = true
+	
+	-- Thu nhỏ menu thứ hai (sau 8 giây)
+	frame.Size = UDim2.new(0, 200, 0, 150) -- Thu nhỏ menu sau khi loading
+	frame.Position = UDim2.new(0.5, -100, 0.5, -75) -- Điều chỉnh vị trí của menu đã thu nhỏ
 end)
