@@ -1,4 +1,4 @@
--- Dupe Hub v2.1 (PlayerGui): giao diện chỉnh chiều cao và nút lệch trái
+-- Dupe Hub v2.2 (PlayerGui): fix khoảng thừa phải & dưới nút Duplicate
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -11,7 +11,8 @@ if old then old:Destroy() end
 
 local function pill(parent, text)
 	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(0.66, 0, 0, 46) -- chỉ chiếm 2/3 chiều ngang
+	b.Size = UDim2.new(1, -8, 1, -8) -- khít đều 4 phía
+	b.Position = UDim2.new(0, 4, 0, 4)
 	b.BackgroundColor3 = Color3.fromRGB(114, 106, 240)
 	b.Text = text
 	b.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -114,7 +115,7 @@ TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDi
 -- Main Hub
 local frame = Instance.new("Frame", gui)
 frame.Visible = false
-frame.Size = UDim2.new(0, 400, 0, 150) -- thấp hơn, khít hơn
+frame.Size = UDim2.new(0, 400, 0, 150)
 frame.Position = UDim2.new(0.5, -200, 0.5, -75)
 frame.BackgroundColor3 = Color3.fromRGB(20, 22, 26)
 frame.BorderSizePixel = 0
@@ -139,12 +140,13 @@ t.TextColor3 = Color3.fromRGB(235, 235, 245)
 t.Text = "Dupe Hub"
 dragify(titleBar, frame)
 
+-- Body khít nút
 local body = Instance.new("Frame", frame)
 body.BackgroundTransparency = 1
-body.Size = UDim2.new(1, -24, 1, -64)
-body.Position = UDim2.new(0, 12, 0, 56)
+body.Size = UDim2.new(1, -32, 0, 60)
+body.Position = UDim2.new(0, 16, 0, 64)
 
--- Progress 10s
+-- Hiệu ứng tiến trình 10s
 local function ShowProgress10s()
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
@@ -203,9 +205,8 @@ local function ShowProgress10s()
 	end)
 end
 
--- Nút 🧠 Duplicate lệch trái, vừa khung
+-- Nút 🧠 Duplicate cân khít
 local btnDup2 = pill(body, "🧠 Duplicate")
-btnDup2.Position = UDim2.new(0, 0, 0, 0)
 pillColor(btnDup2, 114, 106, 240)
 btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
