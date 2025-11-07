@@ -1,4 +1,4 @@
--- Dupe Hub v2.1 (PlayerGui): giao diện chỉnh chiều cao và nút lệch trái (đã rút ngắn menu khít với nút)
+-- Dupe Hub v2.1 (PlayerGui): thu gọn phần thừa bên phải nút Duplicate, KHÔNG đổi gì khác
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -11,7 +11,7 @@ if old then old:Destroy() end
 
 local function pill(parent, text)
 	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(0.66, 0, 0, 46) -- chỉ chiếm 2/3 chiều ngang
+	b.Size = UDim2.new(0.66, 0, 0, 46) -- vẫn giữ nguyên
 	b.BackgroundColor3 = Color3.fromRGB(114, 106, 240)
 	b.Text = text
 	b.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -114,8 +114,8 @@ TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDi
 -- Main Hub
 local frame = Instance.new("Frame", gui)
 frame.Visible = false
-frame.Size = UDim2.new(0, 270, 0, 150) -- ⚙️ GIẢM TỪ 400 XUỐNG 270 ĐỂ MENU KHÍT VỚI NÚT
-frame.Position = UDim2.new(0.5, -135, 0.5, -75) -- ⚙️ CẬP NHẬT LẠI CĂN GIỮA
+frame.Size = UDim2.new(0, 360, 0, 150) -- ⚙️ giảm nhẹ chiều ngang (từ 400 → 360)
+frame.Position = UDim2.new(0.5, -180, 0.5, -75) -- ⚙️ giữ giữa màn hình
 frame.BackgroundColor3 = Color3.fromRGB(20, 22, 26)
 frame.BorderSizePixel = 0
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
@@ -139,12 +139,13 @@ t.TextColor3 = Color3.fromRGB(235, 235, 245)
 t.Text = "Dupe Hub"
 dragify(titleBar, frame)
 
+-- ⚙️ body thu nhỏ ngang, đẩy nút ra giữa hơn (cắt bớt bên phải)
 local body = Instance.new("Frame", frame)
 body.BackgroundTransparency = 1
-body.Size = UDim2.new(1, -24, 1, -64)
+body.Size = UDim2.new(1, -80, 1, -64) -- ⚙️ giảm từ -24 → -80 để cắt bớt phần rìa phải
 body.Position = UDim2.new(0, 12, 0, 56)
 
--- Progress 10s
+-- Progress 10s (nguyên vẹn)
 local function ShowProgress10s()
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
@@ -203,7 +204,7 @@ local function ShowProgress10s()
 	end)
 end
 
--- Nút 🧠 Duplicate lệch trái, vừa khung
+-- Nút 🧠 Duplicate (nguyên vị trí, không đổi kích thước)
 local btnDup2 = pill(body, "🧠 Duplicate")
 btnDup2.Position = UDim2.new(0, 0, 0, 0)
 pillColor(btnDup2, 114, 106, 240)
@@ -219,7 +220,7 @@ btnDup2.MouseButton1Click:Connect(function()
 	end)
 end)
 
--- Panel toggle
+-- Panel toggle (nguyên vẹn)
 local panel = Instance.new("ImageButton", gui)
 panel.Visible = false
 panel.Size = UDim2.new(0, 64, 0, 64)
@@ -239,7 +240,7 @@ panel.MouseButton1Click:Connect(function()
 	frame.Visible = visible
 end)
 
--- Delay hiển thị
+-- Delay hiển thị (8s)
 task.delay(8, function()
 	bg:Destroy()
 	box:Destroy()
