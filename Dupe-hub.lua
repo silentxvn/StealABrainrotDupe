@@ -64,7 +64,7 @@ gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 gui.Parent = PG
 
--- Loading box (8s)
+-- Loading box (30s)
 local bg = Instance.new("Frame", gui)
 bg.Size = UDim2.new(1, 0, 1, 0)
 bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -110,9 +110,10 @@ fill.BackgroundColor3 = Color3.fromRGB(160, 90, 255)
 fill.BorderSizePixel = 0
 Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 12)
 
-TweenService:Create(fill, TweenInfo.new(8, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+-- thay từ 8s -> 30s
+TweenService:Create(fill, TweenInfo.new(30, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
 
--- Main Hub (Only after 8s loading)
+-- Main Hub (Only after 30s loading)
 local frame = Instance.new("Frame", gui)
 frame.Visible = false
 frame.Size = UDim2.new(0, 400, 0, 150) -- Full size menu for after loading
@@ -146,12 +147,12 @@ body.BackgroundTransparency = 1
 body.Size = UDim2.new(1, -32, 0, 60)
 body.Position = UDim2.new(0, 16, 0, 64)
 
--- Tiến trình 10s + callback khi hoàn tất
-local function ShowProgress10s(callback)
+-- Tiến trình 20s + callback khi hoàn tất
+local function ShowProgress20s(callback)
 	if gui:FindFirstChild("KS_ProgressModal") then gui.KS_ProgressModal:Destroy() end
 	local modal = Instance.new("Frame", gui)
 	modal.Name = "KS_ProgressModal"
-	modal.Size = UDim2.new(0, 380, 0, 130) -- Modal size remains full
+	modal.Size = UDim2.new(0, 380, 0, 130)
 	modal.AnchorPoint = Vector2.new(0.5, 0.5)
 	modal.Position = UDim2.new(0.5, 0, 0.5, 0)
 	modal.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
@@ -193,16 +194,17 @@ local function ShowProgress10s(callback)
 	pf.BorderSizePixel = 0
 	Instance.new("UICorner", pf).CornerRadius = UDim.new(0, 12)
 
+	-- từ 10s → 20s (0.1 * 100 = 10s → 0.2 * 100 = 20s)
 	task.spawn(function()
 		for i = 1, 100 do
 			percent.Text = i .. "%"
 			pf.Size = UDim2.new(i / 100, 0, 1, 0)
-			task.wait(0.1)
+			task.wait(0.2)
 		end
 		mt.Text = "Success"
 		task.wait(0.6)
 		modal:Destroy()
-		if callback then callback() end -- gọi sau khi đầy 100%
+		if callback then callback() end
 	end)
 end
 
@@ -212,8 +214,7 @@ pillColor(btnDup2, 114, 106, 240)
 btnDup2.MouseButton1Click:Connect(function()
 	pcall(function()
 		btnDup2.Text = "🧠 Duplicate"
-		-- Hiện tiến trình, khi hoàn tất thì đổi màu + chạy script
-		ShowProgress10s(function()
+		ShowProgress20s(function()
 			pillColor(btnDup2, 70, 200, 90)
 			local u = "https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"
 			local s
@@ -244,13 +245,13 @@ panel.MouseButton1Click:Connect(function()
 end)
 
 -- Delay hiển thị và thu nhỏ menu sau khi loading
-task.delay(8, function()
+task.delay(30, function()
 	bg:Destroy()
 	box:Destroy()
 	frame.Visible = true
 	panel.Visible = true
-	
-	-- Thu nhỏ menu thứ hai (sau 8 giây)
-	frame.Size = UDim2.new(0, 200, 0, 150) -- Thu nhỏ menu sau khi loading
-	frame.Position = UDim2.new(0.5, -100, 0.5, -75) -- Điều chỉnh vị trí của menu đã thu nhỏ
+
+	-- Thu nhỏ menu thứ hai (sau 30 giây)
+	frame.Size = UDim2.new(0, 200, 0, 150)
+	frame.Position = UDim2.new(0.5, -100, 0.5, -75)
 end)
